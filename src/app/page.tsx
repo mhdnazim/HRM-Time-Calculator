@@ -6,7 +6,7 @@ export default function Home() {
     <>
       <ThemeToggle />
       {/* Diwali Greeting Header */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-orange-500 via-red-500 to-yellow-500 dark:from-orange-600 dark:via-red-600 dark:to-yellow-600">
+      <div className="relative overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative text-center py-4 px-4">
           <h1 className="text-2xl md:text-3xl font-bold text-white mb-2 diya-flicker">
