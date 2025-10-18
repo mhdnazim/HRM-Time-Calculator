@@ -25,18 +25,38 @@ export default function TimeCalculator() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
-      <div className="max-w-7xl mx-auto">
+      {/* Diwali background pattern */}
+      <div className="absolute inset-0 opacity-5 dark:opacity-10">
+        <div className="absolute top-10 left-10 text-6xl text-orange-300 float-diya">🪔</div>
+        <div className="absolute top-20 right-20 text-4xl text-yellow-300 sparkle-twinkle delay-100">✨</div>
+        <div className="absolute bottom-20 left-20 text-5xl text-red-300 float-diya delay-200">🪔</div>
+        <div className="absolute bottom-10 right-10 text-3xl text-orange-300 sparkle-twinkle delay-300">✨</div>
+        <div className="absolute top-1/2 left-1/4 text-4xl text-yellow-300 float-diya delay-500">🪔</div>
+        <div className="absolute top-1/3 right-1/3 text-3xl text-red-300 sparkle-twinkle delay-700">✨</div>
+      </div>
+      
+      <div className="max-w-6xl mx-auto relative">
         {/* Header */}
         <div className="text-center space-y-2 py-6 mb-6">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Coffee className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
+            <div className="relative">
+              <Coffee className="h-8 w-8 text-orange-600 dark:text-orange-400" />
+              <div className="absolute -top-1 -right-1 text-lg animate-bounce">🪔</div>
+            </div>
+            <h1 className="text-4xl font-bold diwali-text">
               Break Time Calculator
             </h1>
           </div>
           <p className="text-gray-600 dark:text-gray-300 text-lg">
             Track your work breaks and calculate productive hours
           </p>
+          <div className="flex justify-center gap-2 mt-4">
+            <span className="text-2xl animate-bounce">🪔</span>
+            <span className="text-lg animate-bounce delay-100">✨</span>
+            <span className="text-2xl animate-bounce delay-200">🪔</span>
+            <span className="text-lg animate-bounce delay-300">✨</span>
+            <span className="text-2xl animate-bounce delay-500">🪔</span>
+          </div>
         </div>
 
         {/* Main Content - Side by Side Layout */}
@@ -44,10 +64,13 @@ export default function TimeCalculator() {
           {/* Left Column - Input */}
           <div className="space-y-6">
             {/* Input Card */}
-            <Card className="shadow-lg border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+            <Card className="shadow-lg border-0 bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-gray-800/90 dark:to-gray-700/90 backdrop-blur-sm border-l-4 border-orange-400">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Timer className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  <div className="relative">
+                    <Timer className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                    <div className="absolute -top-1 -right-1 text-xs animate-pulse">🪔</div>
+                  </div>
                   Time Logs
                 </CardTitle>
                 <CardDescription>
@@ -59,11 +82,11 @@ export default function TimeCalculator() {
                   value={timeLogs}
                   onChange={(e) => setTimeLogs(e.target.value)}
                   placeholder={placeholderText}
-                  className="min-h-[200px] font-mono text-sm resize-none"
+                  className="min-h-[200px] font-mono text-sm resize-none border-orange-200 focus:border-orange-400 dark:border-orange-700 dark:focus:border-orange-500"
                 />
                 <Button 
                   onClick={handleCalculate}
-                  className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                  className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 dark:from-orange-600 dark:to-red-600 dark:hover:from-orange-700 dark:hover:to-red-700 text-white font-semibold shadow-lg"
                   size="lg"
                 >
                   <Clock className="h-4 w-4 mr-2" />
@@ -73,9 +96,12 @@ export default function TimeCalculator() {
             </Card>
 
             {/* Instructions Card */}
-            <Card className="shadow-lg border-0 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm">
+            <Card className="shadow-lg border-0 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-gray-800/70 dark:to-gray-700/70 backdrop-blur-sm border-l-4 border-yellow-400">
               <CardHeader>
-                <CardTitle className="text-lg">How to use</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <span className="text-xl">📋</span>
+                  How to use
+                </CardTitle>
               </CardHeader>
               <CardContent className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
                 <p>• Enter each time entry on a new line</p>
@@ -85,6 +111,11 @@ export default function TimeCalculator() {
                 <p>• <strong>Productive hours target:</strong> 8 hours must be completed</p>
                 <p>• Standard workday: 8 hours + break time</p>
                 <p>• Warning threshold: 60 minutes total break time</p>
+                <div className="mt-4 p-3 bg-gradient-to-r from-orange-100 to-yellow-100 dark:from-orange-900/30 dark:to-yellow-900/30 rounded-lg border border-orange-200 dark:border-orange-700">
+                  <p className="text-orange-700 dark:text-orange-300 font-medium text-center">
+                    🪔 Happy Diwali! May your work be as bright as the festival of lights! ✨
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -92,10 +123,13 @@ export default function TimeCalculator() {
           {/* Right Column - Results */}
           <div className="space-y-6">
             {results ? (
-              <Card className="shadow-lg border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+              <Card className="shadow-lg border-0 bg-gradient-to-br from-red-50 to-orange-50 dark:from-gray-800/90 dark:to-gray-700/90 backdrop-blur-sm border-l-4 border-red-400">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                    <div className="relative">
+                      <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                      <div className="absolute -top-1 -right-1 text-xs animate-pulse">✨</div>
+                    </div>
                     Results
                   </CardTitle>
                 </CardHeader>
@@ -180,15 +214,24 @@ export default function TimeCalculator() {
                 </CardContent>
               </Card>
             ) : (
-              <Card className="shadow-lg border-0 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm">
+              <Card className="shadow-lg border-0 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-gray-800/70 dark:to-gray-700/70 backdrop-blur-sm border-l-4 border-yellow-400">
                 <CardContent className="p-8 text-center">
-                  <Clock className="h-16 w-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+                  <div className="relative mb-4">
+                    <Clock className="h-16 w-16 text-orange-400 dark:text-orange-500 mx-auto" />
+                    <div className="absolute -top-2 -right-2 text-2xl animate-bounce">🪔</div>
+                    <div className="absolute -bottom-1 -left-2 text-lg animate-pulse">✨</div>
+                  </div>
                   <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
                     No Results Yet
                   </h3>
-                  <p className="text-gray-500 dark:text-gray-400">
+                  <p className="text-gray-500 dark:text-gray-400 mb-4">
                     Enter your time logs and click "Calculate Break Time" to see your results here.
                   </p>
+                  <div className="p-3 bg-gradient-to-r from-orange-100 to-yellow-100 dark:from-orange-900/30 dark:to-yellow-900/30 rounded-lg border border-orange-200 dark:border-orange-700">
+                    <p className="text-orange-700 dark:text-orange-300 text-sm">
+                      🪔 May your productivity shine as bright as Diwali lights! ✨
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             )}
