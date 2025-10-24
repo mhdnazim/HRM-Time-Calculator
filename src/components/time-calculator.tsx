@@ -6,16 +6,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { calculateBreakTime, formatTime } from '@/lib/time-utils';
-import { Clock, Timer, CheckCircle, AlertTriangle, Coffee } from 'lucide-react';
+import { Clock, Timer, CheckCircle, AlertTriangle, Coffee, User, UserMinus, UserX } from 'lucide-react';
 
 export default function TimeCalculator() {
   const [timeLogs, setTimeLogs] = useState('');
   const [results, setResults] = useState<any>(null);
+  const [workType, setWorkType] = useState<'full-day' | 'hlop' | 'qlop'>('full-day');
 
   const handleCalculate = () => {
     if (!timeLogs.trim()) return;
     
-    const calculationResults = calculateBreakTime(timeLogs);
+    const calculationResults = calculateBreakTime(timeLogs, workType);
     setResults(calculationResults);
   };
 
@@ -55,6 +56,46 @@ export default function TimeCalculator() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Work Type Selection */}
+                <div className="flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Work Type:</span>
+                  <div className="flex gap-3">
+                    <label className="flex items-center gap-1 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="workType"
+                        value="full-day"
+                        checked={workType === 'full-day'}
+                        onChange={(e) => setWorkType(e.target.value as 'full-day')}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Full Day</span>
+                    </label>
+                    <label className="flex items-center gap-1 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="workType"
+                        value="hlop"
+                        checked={workType === 'hlop'}
+                        onChange={(e) => setWorkType(e.target.value as 'hlop')}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm text-gray-600 dark:text-gray-400">HLOP</span>
+                    </label>
+                    <label className="flex items-center gap-1 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="workType"
+                        value="qlop"
+                        checked={workType === 'qlop'}
+                        onChange={(e) => setWorkType(e.target.value as 'qlop')}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm text-gray-600 dark:text-gray-400">QLOP</span>
+                    </label>
+                  </div>
+                </div>
+
                 <Textarea
                   value={timeLogs}
                   onChange={(e) => setTimeLogs(e.target.value)}
@@ -78,13 +119,14 @@ export default function TimeCalculator() {
                 <CardTitle className="text-lg">How to use</CardTitle>
               </CardHeader>
               <CardContent className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                <p>• Select your work type: Full Day, HLOP, or QLOP</p>
                 <p>• Enter each time entry on a new line</p>
                 <p>• Format: HH:MM:SS AM/PM [TAB] In/Out</p>
                 <p>• Example: 08:40:01 AM	In</p>
-                <p>• <strong>Break time target:</strong> 45 minutes (shows green when reached)</p>
-                <p>• <strong>Productive hours target:</strong> 8 hours must be completed</p>
-                <p>• Standard workday: 8 hours + break time</p>
-                <p>• Warning threshold: 60 minutes total break time</p>
+                <p>• <strong>Full Day:</strong> 8h productive + 45min minimum break</p>
+                <p>• <strong>HLOP:</strong> 4h productive + 20min minimum break</p>
+                <p>• <strong>QLOP:</strong> 6h productive + 30min minimum break</p>
+                <p>• Break time shows green when minimum is reached</p>
               </CardContent>
             </Card>
           </div>
@@ -106,29 +148,33 @@ export default function TimeCalculator() {
                       Total break/out time:
                     </span>
                     <Badge 
-                      variant={results.totalBreakTime < (45 * 60) ? "destructive" : "default"}
+                      variant={results.isBreakTimeSufficient ? "default" : "destructive"}
                       className={`text-lg px-3 py-1 ${
-                        results.totalBreakTime < (45 * 60)
-                          ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                          : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                        results.isBreakTimeSufficient
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                       }`}
                     >
                       {formatTime(results.totalBreakTime)}
                     </Badge>
                   </div>
 
-                  {/* Remaining Break Time */}
+                  {/* Break Time Status */}
                   <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                     <span className="font-medium text-gray-700 dark:text-gray-300">
-                      {results.isOverLimit ? 'Exceeded break time by:' : 'Remaining break time:'}
+                      {results.isBreakTimeSufficient ? 'Break time status:' : 'Break time needed:'}
                     </span>
                     <Badge 
-                      variant={results.isOverLimit ? "destructive" : "default"}
-                      className="text-lg px-3 py-1"
+                      variant={results.isBreakTimeSufficient ? "default" : "secondary"}
+                      className={`text-lg px-3 py-1 ${
+                        results.isBreakTimeSufficient
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                          : 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'
+                      }`}
                     >
-                      {results.isOverLimit 
-                        ? formatTime(results.totalBreakTime - (45 * 60))
-                        : formatTime(Math.max(0, results.remainingBreakTime))
+                      {results.isBreakTimeSufficient
+                        ? 'Minimum reached'
+                        : formatTime(results.remainingBreakTime)
                       }
                     </Badge>
                   </div>
@@ -160,20 +206,20 @@ export default function TimeCalculator() {
                     </Badge>
                   </div>
 
-                  {/* Time Left for 8h */}
+                  {/* Time Left for Target Hours */}
                   <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                     <span className="font-medium text-gray-700 dark:text-gray-300">
-                      {results.isProductiveComplete ? 'Status:' : 'Time left for 8h:'}
+                      {results.isProductiveComplete ? 'Status:' : `Time left for ${formatTime(results.targetProductiveHours)}:`}
                     </span>
                     {results.isProductiveComplete ? (
                       <Badge className="text-lg px-3 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                         <CheckCircle className="h-4 w-4 mr-1" />
-                        8h completed
+                        {formatTime(results.targetProductiveHours)} completed
                       </Badge>
                     ) : (
                       <Badge variant="secondary" className="text-lg px-3 py-1 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
                         <AlertTriangle className="h-4 w-4 mr-1" />
-                        {formatTime(results.timeLeftFor8Hours)}
+                        {formatTime(results.timeLeftForTargetHours)}
                       </Badge>
                     )}
                   </div>

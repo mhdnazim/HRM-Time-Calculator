@@ -63,13 +63,17 @@ export interface BreakCalculationResult {
   firstInTime: number | null;
   remainingBreakTime: number;
   isOverLimit: boolean;
+  isBreakTimeSufficient: boolean;
   expectedExitTime: string;
   productiveHours: number;
-  timeLeftFor8Hours: number;
+  timeLeftForTargetHours: number;
   isProductiveComplete: boolean;
+  workType: 'full-day' | 'hlop' | 'qlop';
+  targetBreakTime: number;
+  targetProductiveHours: number;
 }
 
-export function calculateBreakTime(timeLogs: string): BreakCalculationResult {
+export function calculateBreakTime(timeLogs: string, workType: 'full-day' | 'hlop' | 'qlop' = 'full-day'): BreakCalculationResult {
   const lines = timeLogs.trim().split('\n').filter(line => line.trim());
   const events: TimeEntry[] = lines.map(line => {
     const [timeStr, typeStr] = line.split('\t').map(s => s.trim());
@@ -100,35 +104,57 @@ export function calculateBreakTime(timeLogs: string): BreakCalculationResult {
     }
   }
 
-  const allowedBreakTime = 45 * 60; // 45 minutes in seconds
-  const warningThreshold = allowedBreakTime + 15 * 60; // 60 minutes total
-  const remainingBreakTime = allowedBreakTime - totalBreakTime;
-  const isOverLimit = totalBreakTime > warningThreshold;
+  // Set targets based on work type
+  let targetBreakTime: number;
+  let targetProductiveHours: number;
+  
+  switch (workType) {
+    case 'hlop':
+      targetBreakTime = 20 * 60; // 20 minutes
+      targetProductiveHours = 4 * 3600; // 4 hours
+      break;
+    case 'qlop':
+      targetBreakTime = 30 * 60; // 30 minutes
+      targetProductiveHours = 6 * 3600; // 6 hours
+      break;
+    case 'full-day':
+    default:
+      targetBreakTime = 45 * 60; // 45 minutes
+      targetProductiveHours = 8 * 3600; // 8 hours
+      break;
+  }
+  
+  const remainingBreakTime = Math.max(0, targetBreakTime - totalBreakTime);
+  const isBreakTimeSufficient = totalBreakTime >= targetBreakTime;
+  const isOverLimit = totalBreakTime > (targetBreakTime + 15 * 60); // Warning if way over minimum
 
   // Calculate expected exit time
   let expectedExitTime = 'N/A';
   if (firstInTime !== null) {
-    if (totalBreakTime <= allowedBreakTime) {
-      expectedExitTime = formatClockTime(firstInTime + (8 * 3600 + 45 * 60));
-    } else {
-      expectedExitTime = formatClockTime(firstInTime + (8 * 3600) + totalBreakTime);
-    }
+    // Expected exit time is based on actual break time taken (must be at least minimum)
+    const actualBreakTime = Math.max(totalBreakTime, targetBreakTime);
+    expectedExitTime = formatClockTime(firstInTime + targetProductiveHours + actualBreakTime);
   }
 
   // Calculate productive hours
   let productiveHours = 0;
-  let timeLeftFor8Hours = 8 * 3600;
+  let timeLeftForTargetHours = targetProductiveHours;
   let isProductiveComplete = false;
 
   if (firstInTime !== null) {
-    const currentTime = getCurrentTimeInSeconds();
-    productiveHours = (currentTime - firstInTime) - totalBreakTime;
+    // Use the last logged time if the last entry is "Out", otherwise use current time
+    const lastEvent = events[events.length - 1];
+    const calculationTime = lastEvent && lastEvent.type === 'out' 
+      ? lastEvent.timeInSeconds 
+      : getCurrentTimeInSeconds();
     
-    if (productiveHours >= 8 * 3600) {
+    productiveHours = (calculationTime - firstInTime) - totalBreakTime;
+    
+    if (productiveHours >= targetProductiveHours) {
       isProductiveComplete = true;
-      timeLeftFor8Hours = 0;
+      timeLeftForTargetHours = 0;
     } else {
-      timeLeftFor8Hours = (8 * 3600) - productiveHours;
+      timeLeftForTargetHours = targetProductiveHours - productiveHours;
     }
   }
 
@@ -137,9 +163,13 @@ export function calculateBreakTime(timeLogs: string): BreakCalculationResult {
     firstInTime,
     remainingBreakTime,
     isOverLimit,
+    isBreakTimeSufficient,
     expectedExitTime,
     productiveHours,
-    timeLeftFor8Hours,
-    isProductiveComplete
+    timeLeftForTargetHours,
+    isProductiveComplete,
+    workType,
+    targetBreakTime,
+    targetProductiveHours
   };
 }
