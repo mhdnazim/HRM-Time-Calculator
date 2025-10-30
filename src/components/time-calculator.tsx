@@ -124,7 +124,7 @@ export default function TimeCalculator() {
                 <p>• Format: HH:MM:SS AM/PM [TAB] In/Out</p>
                 <p>• Example: 08:40:01 AM	In</p>
                 <p>• <strong>Full Day:</strong> 8h productive + 45min minimum break</p>
-                <p>• <strong>HLOP:</strong> 4h productive + 20min minimum break</p>
+                <p>• <strong>HLOP:</strong> 4h productive + 15min minimum break</p>
                 <p>• <strong>QLOP:</strong> 6h productive + 30min minimum break</p>
                 <p>• Break time shows green when minimum is reached</p>
               </CardContent>

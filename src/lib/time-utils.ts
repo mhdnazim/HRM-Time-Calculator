@@ -110,7 +110,7 @@ export function calculateBreakTime(timeLogs: string, workType: 'full-day' | 'hlo
   
   switch (workType) {
     case 'hlop':
-      targetBreakTime = 20 * 60; // 20 minutes
+      targetBreakTime = 15 * 60; // 15 minutes
       targetProductiveHours = 4 * 3600; // 4 hours
       break;
     case 'qlop':
