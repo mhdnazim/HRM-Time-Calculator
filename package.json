@@ -3,13 +3,14 @@
   "version": "1.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
-    "start": "next start"
+    "dev": "node api.js && next dev --turbopack",
+    "build": "node api.js && next build --turbopack",
+    "start": "node api.js && next start"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
     "@vercel/analytics": "^1.5.0",
+    "@vercel/speed-insights": "^1.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.544.0",
